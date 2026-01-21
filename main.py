@@ -19,7 +19,7 @@ MUTATION_RATE = 0.2
 INDPB = 1/NDIM
 CXPROB = 0.9
 
-BASE_POPULATION_SIZE = 50
+BASE_POPULATION_SIZE = 100
 
 import numpy as np
 
@@ -36,7 +36,7 @@ def mutate(x):
         elif mutated[i] > HIGH:
             mutated[i] = HIGH
     if len(mutated) != NDIM:
-        print("mutate")
+        print("ERROR: mutate failed")
     ind = np.astype(mutated, np.float32)
     return (ind, fitness(ind))
 def varAnd(popln):
