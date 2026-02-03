@@ -2,3 +2,4 @@ numpy
 tsplib95
 grpcio
 grpcio_tools
+deap
