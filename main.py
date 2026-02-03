@@ -29,13 +29,13 @@ creator.create("Individual", array, fitness=creator.FitnessMin, typecode='i')
 
 toolbox = base.Toolbox()
 
-toolbox.register('indices', random.select, range(1, NDIM+1))
+toolbox.register('indices', random.sample, range(NDIM), NDIM)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.indices)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evaluate_tsp(individual):
     # Convert array back to list for tsplib if necessary
-    return (problem.trace_tours([list(individual)])[0],)
+    return (problem.trace_tours([[i+1 for i in individual]])[0],)
 
 toolbox.register("evaluate", evaluate_tsp)
 toolbox.register("mate", tools.cxOrdered)
@@ -53,12 +53,11 @@ def ind_to_bytes(individual: array) -> bytes:
 def bytes_to_ind(data: bytes):
     """Converts bytes back to a DEAP array Individual."""
     indices = struct.unpack(STRUCT_FORMAT, data)
-    return creator.Individual('i', indices)
+    return creator.Individual(indices)
 
 # --- Servicer Implementation ---
 class VolpeGreeterServicer(vp.VolpeContainerServicer):
     def __init__(self):
-        self.popln = toolbox.population(n=BASE_POPULATION_SIZE)
         # Evaluate initial population
         self.popln = toolbox.population(n=BASE_POPULATION_SIZE)
         for ind in self.popln:
@@ -97,6 +96,27 @@ class VolpeGreeterServicer(vp.VolpeContainerServicer):
             return pbc.Population(members=members)
 
     @override
+    def GetResults(self, request: pb.PopulationSize, context: grpc.ServicerContext):
+        with self.poplock:
+            if not self.popln:
+                return pb.ResultPopulation(members=[])
+            top_n = tools.selBest(self.popln, k=request.size)
+            
+            indList: list[pb.ResultIndividual] = []
+            for mem in top_n:
+                # Convert the array.array/DEAP individual to a clean list for string output
+                route_str = str(list(mem))
+                
+                indList.append(
+                    pb.ResultIndividual(
+                        representation=route_str,
+                        fitness=mem.fitness.values[0]
+                    )
+                )
+            
+            return pb.ResultPopulation(members=indList)
+
+    @override
     def RunForGenerations(self, request, context):
         with self.poplock:
             self.popln, logbook = algorithms.eaMuPlusLambda(
@@ -106,7 +126,7 @@ class VolpeGreeterServicer(vp.VolpeContainerServicer):
                 lambda_= LAMBDA_SIZE,
                 cxpb=CXPROB,
                 mutpb=MUTATION_RATE,
-                ngen=1,        # We run 1 generation per RPC call
+                ngen=1,
                 verbose=False
             )
             current_best = tools.selBest(self.popln, 1)[0].fitness.values[0]

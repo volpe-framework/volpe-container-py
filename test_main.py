@@ -7,8 +7,6 @@ serv = gt.VolpeGreeterServicer()
 
 serv.InitFromSeed(gt.pb.Seed(seed=1), None)
 print("initialized")
-serv.AdjustPopulationSize(gt.pb.PopulationSize(size=200), None)
-print("adjusted size")
 start = time.time()
 last = time.time()
 
