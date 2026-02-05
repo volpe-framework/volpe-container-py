@@ -96,6 +96,18 @@ class VolpeGreeterServicer(vp.VolpeContainerServicer):
             return pbc.Population(members=members)
 
     @override
+    def GetRandom(self, request, context):
+        with self.poplock:
+            rand_inds = tools.selRandom(self.popln, request.size)
+            members = [
+                pbc.Individual(
+                    genotype=ind_to_bytes(ind),
+                    fitness=ind.fitness.values[0]
+                ) for ind in rand_inds
+            ]
+            return pbc.Population(members=members)
+
+    @override
     def GetResults(self, request: pb.PopulationSize, context: grpc.ServicerContext):
         with self.poplock:
             if not self.popln:
