@@ -26,11 +26,11 @@ class ImageStreamObject(_message.Message):
     __slots__ = ("details", "chunk")
     DETAILS_FIELD_NUMBER: _ClassVar[int]
     CHUNK_FIELD_NUMBER: _ClassVar[int]
-    details: ImageDetails
+    details: ProblemDetails
     chunk: ImageChunk
-    def __init__(self, details: _Optional[_Union[ImageDetails, _Mapping]] = ..., chunk: _Optional[_Union[ImageChunk, _Mapping]] = ...) -> None: ...
+    def __init__(self, details: _Optional[_Union[ProblemDetails, _Mapping]] = ..., chunk: _Optional[_Union[ImageChunk, _Mapping]] = ...) -> None: ...
 
-class ImageDetails(_message.Message):
+class ProblemDetails(_message.Message):
     __slots__ = ("problemID", "imageSizeBytes", "migrationFrequency", "migrationSize")
     PROBLEMID_FIELD_NUMBER: _ClassVar[int]
     IMAGESIZEBYTES_FIELD_NUMBER: _ClassVar[int]
