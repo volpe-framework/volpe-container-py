@@ -190,22 +190,23 @@ class VolpeGreeterServicer(volpe.VolpeContainerServicer):
     def RunForGenerations(self, request: volpe.PopulationSize, context):
         """Missing associated documentation comment in .proto file."""
         with self.poplock:
-            ogLen = len(self.popln)
-            popln = select(self.popln, ogLen)
-            newpopln = [ ]
-            for i in range(0, ogLen, 2):
-                if np.random.random() < CXPROB:
-                    i1 = i
-                    i2 = i+1
-                    n1, n2 = crossover(popln[i1], popln[i2])
-                    newpopln.append(n1)
-                    newpopln.append(n2)
-                else:
-                    newpopln.append(popln[i])
-                    newpopln.append(popln[i+1])
-            self.popln = mutate_popln(newpopln)
-            self.popln = expand(self.popln, ogLen*2)
-            self.popln = select(self.popln, ogLen)
+            for _ in range(request.size):
+                ogLen = len(self.popln)
+                popln = select(self.popln, ogLen)
+                newpopln = [ ]
+                for i in range(0, ogLen, 2):
+                    if np.random.random() < CXPROB:
+                        i1 = i
+                        i2 = i+1
+                        n1, n2 = crossover(popln[i1], popln[i2])
+                        newpopln.append(n1)
+                        newpopln.append(n2)
+                    else:
+                        newpopln.append(popln[i])
+                        newpopln.append(popln[i+1])
+                self.popln = mutate_popln(newpopln)
+                self.popln = expand(self.popln, ogLen*2)
+                self.popln = select(self.popln, ogLen)
         return volpe.Reply(success=True)
 
 if __name__=='__main__':
