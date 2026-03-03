@@ -11,7 +11,7 @@ from deap import base, creator, tools, algorithms
 
 NDIM=20
 
-func = F72022(ndim=NDIM)
+func = F122022(ndim=NDIM)
 
 LOW = func.lb[0]
 HIGH = func.ub[0]
@@ -20,7 +20,7 @@ MUTATION_RATE = 0.5
 INDPB = 1/NDIM
 CXPROB = 0.5
 
-BASE_POPULATION_SIZE = 50
+BASE_POPULATION_SIZE = 100
 LAMBDA_SIZE = 7*BASE_POPULATION_SIZE
 
 import numpy as np
