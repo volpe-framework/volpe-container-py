@@ -1,6 +1,6 @@
 numpy
 opfunu
-grpcio-tools
-protobuf
+grpcio-tools>=1.78.1
+protobuf>=6.31.0
 setuptools<81
 deap
