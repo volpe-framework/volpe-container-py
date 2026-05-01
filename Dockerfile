@@ -1,20 +1,21 @@
 FROM python:3.11-slim
 
-# Sample dockerfile to generate image for testing container mgr
+# Use a minimal base image and install dependencies needed for Python package builds.
+ENV PIP_NO_CACHE_DIR=1
 
-RUN apt-get -y update && apt-get -y upgrade
-
-RUN pip install grpcio grpcio_tools
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home
 
-COPY ./volpe_py ./volpe_py
-
 COPY requirements.txt .
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && python -m pip install --prefer-binary -r requirements.txt
 
-RUN pip install -r requirements.txt
-
+COPY ./volpe_py ./volpe_py
 COPY . .
 
-CMD [ "/usr/local/bin/python3", "./main.py" ]
+CMD ["python", "./main.py"]
 
